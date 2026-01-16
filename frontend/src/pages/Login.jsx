@@ -1,23 +1,94 @@
-import { useNavigate } from "react-router-dom";
+import { useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import { motion } from "framer-motion";
+import { Mail, Lock, Loader2 } from "lucide-react";
+import toast from "react-hot-toast";
+import { loginUser } from "../services/api";
+import Button from "../components/Button";
 
 export default function Login() {
+  const [formData, setFormData] = useState({ email: "", password: "" });
+  const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
-  const handleLogin = () => {
-    // For now, we just set a dummy token
-    localStorage.setItem("token", "dummy-token");
-    navigate("/dashboard");
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setLoading(true);
+    try {
+      await loginUser(formData);
+      toast.success("Welcome back!");
+      navigate("/dashboard");
+    } catch (err) {
+      toast.error(err.msg || "Login failed");
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
-    <div className="flex flex-col items-center justify-center h-screen bg-gray-900 text-white">
-      <h1 className="text-3xl mb-6">Login</h1>
-      <button
-        onClick={handleLogin}
-        className="px-6 py-3 bg-blue-500 rounded hover:bg-blue-600"
+    <div className="min-h-screen flex items-center justify-center relative overflow-hidden bg-slate-950">
+      {/* Background Ambience */}
+      <div className="absolute inset-0 overflow-hidden pointer-events-none">
+        <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-primary-600/20 rounded-full blur-[128px]" />
+        <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-indigo-600/10 rounded-full blur-[128px]" />
+      </div>
+
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        className="relative z-10 w-full max-w-md p-8 bg-white/5 backdrop-blur-xl border border-white/10 rounded-3xl shadow-2xl"
       >
-        Login
-      </button>
+        <div className="text-center mb-8">
+          <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-gradient-to-br from-primary-500 to-indigo-600 mb-6 shadow-lg shadow-primary-500/20">
+            <span className="text-3xl font-bold text-white">Tw</span>
+          </div>
+          <h1 className="text-3xl font-bold text-white mb-2">Welcome Back</h1>
+          <p className="text-slate-400">Sign in to continue your productivity journey</p>
+        </div>
+
+        <form onSubmit={handleSubmit} className="space-y-6">
+          <div className="space-y-1">
+            <label className="text-sm font-medium text-white/60 ml-1">Email Address</label>
+            <div className="relative group">
+              <input
+                type="email"
+                value={formData.email}
+                onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                className="w-full bg-white/5 border border-white/10 rounded-xl py-3 pl-10 pr-4 text-white placeholder-slate-500 focus:outline-none focus:border-primary-500 focus:bg-slate-900/50 transition-all duration-300"
+                placeholder="you@example.com"
+                required
+              />
+              <Mail size={18} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500 group-focus-within:text-primary-400 transition-colors" />
+            </div>
+          </div>
+
+          <div className="space-y-1">
+            <label className="text-sm font-medium text-white/60 ml-1">Password</label>
+            <div className="relative group">
+              <input
+                type="password"
+                value={formData.password}
+                onChange={(e) => setFormData({ ...formData, password: e.target.value })}
+                className="w-full bg-white/5 border border-white/10 rounded-xl py-3 pl-10 pr-4 text-white placeholder-slate-500 focus:outline-none focus:border-primary-500 focus:bg-slate-900/50 transition-all duration-300"
+                placeholder="••••••••"
+                required
+              />
+              <Lock size={18} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500 group-focus-within:text-primary-400 transition-colors" />
+            </div>
+          </div>
+
+          <Button type="submit" variant="primary" disabled={loading} className="w-full py-4 text-lg">
+            {loading ? <Loader2 className="animate-spin" /> : "Sign In"}
+          </Button>
+        </form>
+
+        <p className="text-center mt-8 text-slate-400">
+          Don't have an account?{" "}
+          <Link to="/signup" className="text-primary-400 hover:text-primary-300 font-medium transition-colors">
+            Sign Up
+          </Link>
+        </p>
+      </motion.div>
     </div>
   );
 }

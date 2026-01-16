@@ -1,30 +1,53 @@
-import { Link, Route, BrowserRouter as Router, Routes } from "react-router-dom";
+import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
 import Dashboard from "./pages/Dashboard";
-import Login from "./pages/Login"; // if you have auth
-import TasksPage from "./pages/TasksPage"; // if you have another page
+import Login from "./pages/Login";
+import Signup from "./pages/Signup";
+import LandingPage from "./pages/LandingPage";
+import Layout from "./components/Layout";
+import { Toaster } from 'react-hot-toast';
+
+// Protected Route Component
+const ProtectedRoute = ({ children }) => {
+  const token = localStorage.getItem("token");
+  if (!token) {
+    return <Navigate to="/login" replace />;
+  }
+  return <Layout>{children}</Layout>;
+};
 
 function App() {
-  const handleLogout = () => {
-    localStorage.removeItem("token");
-    window.location.href = "/login"; // redirect to login
-  };
-
   return (
     <Router>
-      {/* Navigation */}
-      <nav className="flex gap-4 p-4 bg-gray-100">
-        <Link to="/dashboard" className="text-blue-500">Dashboard</Link>
-        <Link to="/tasks" className="text-blue-500">Tasks</Link>
-        <button onClick={handleLogout} className="text-red-500">Logout</button>
-      </nav>
-
-      {/* Routes */}
       <Routes>
-        <Route path="/dashboard" element={<Dashboard />} />
-        <Route path="/tasks" element={<TasksPage />} />
+        {/* Public Routes */}
+        <Route path="/" element={<LandingPage />} />
         <Route path="/login" element={<Login />} />
-        <Route path="*" element={<Login />} /> {/* Redirect unknown routes to login */}
+        <Route path="/signup" element={<Signup />} />
+
+        {/* Protected Routes (Wrapped in Layout) */}
+        <Route path="/dashboard" element={
+          <ProtectedRoute>
+            <Dashboard />
+          </ProtectedRoute>
+        } />
+
+        {/* Default Redirect */}
+        <Route path="/" element={<Navigate to="/dashboard" replace />} />
+        <Route path="*" element={<Navigate to="/dashboard" />} />
       </Routes>
+
+      <Toaster
+        position="bottom-right"
+        toastOptions={{
+          style: {
+            background: 'rgba(15, 23, 42, 0.8)',
+            backdropFilter: 'blur(12px)',
+            border: '1px solid rgba(255,255,255,0.1)',
+            color: '#fff',
+            borderRadius: '12px',
+          }
+        }}
+      />
     </Router>
   );
 }

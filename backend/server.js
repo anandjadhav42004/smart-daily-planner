@@ -12,6 +12,7 @@ app.use(express.json());
 
 // ✅ Routes
 app.use("/api/tasks", taskRoutes);
+app.use("/api/auth", require("./routes/auth"));
 
 // ✅ MongoDB connection
 mongoose
