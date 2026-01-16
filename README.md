@@ -113,6 +113,6 @@ This project uses the popular **MERN stack** (MongoDB, Express, React, Node), wh
 * A responsive frontend
 * A RESTful backend API
 * Persistent server-side storage
-  Similar MERN planner apps also follow this pattern with CRUD task operations and backend persistence. ([GeeksforGeeks][1])
+  Similar MERN planner apps also follow this pattern with CRUD task operations and backend persistence. 
 
 ---
